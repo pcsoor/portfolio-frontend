@@ -1,34 +1,64 @@
 import React from 'react'
 import {Disclosure, Menu, Transition} from '@headlessui/react'
-import {NavLink} from 'react-router-dom'
+import {NavLink, Link, useHistory} from 'react-router-dom'
 import {Sparkles} from "heroicons-react"
+import userEvent from '@testing-library/user-event'
+import {createPopper} from "@popperjs/core";
 
-const navigation = [
-    {
-        name: 'Home',
-        href: '/',
-        current: true
-    }, {
-        name: 'My Work',
-        href: '/work',
-        current: false
-    }, {
-        name: 'Resume',
-        href: '/resume',
-        current: false
-    }, {
-        name: 'Contact',
-        href: '/contact',
-        current: false
+function Navbar() {
+    const navigation = [
+        {
+            name: 'Home',
+            href: '/',
+            current: true
+        }, {
+            name: 'My Work',
+            href: '/work',
+            current: false
+        }, {
+            name: 'Resume',
+            href: '/resume',
+            current: false
+        }, {
+            name: 'Contact',
+            href: '/contact',
+            current: false
+        }
+    ]
+
+    
+    var firstName;
+    if (localStorage.getItem('user-info') != null && JSON.parse(localStorage.getItem('user-info')).name != null) {
+        const user = JSON.parse(localStorage.getItem('user-info'));
+        firstName = user.name.split(" ")[0];
     }
-]
-function classNames(...classes) {
-    return classes
-        .filter(Boolean)
-        .join(' ')
-}
+    
 
-export default function Navbar() {
+    const history = useHistory();
+
+    const [dropdownPopoverShow, setDropdownPopoverShow] = React.useState(false);
+    const btnDropdownRef = React.createRef();
+    const popoverDropdownRef = React.createRef();
+
+    const openDropdownPopover = () => {
+        createPopper(btnDropdownRef.current, popoverDropdownRef.current, {placement: "bottom-start"});
+        setDropdownPopoverShow(true);
+    };
+    const closeDropdownPopover = () => {
+        setDropdownPopoverShow(false);
+    };
+
+    function classNames(...classes) {
+        return classes
+            .filter(Boolean)
+            .join(' ')
+    }
+
+    function logout() {
+        localStorage.clear();
+        history.go("/login");
+    }
+
     return (
         <Disclosure as="nav" className="bg-gray-800">
             {({open}) => ( <> <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
@@ -61,16 +91,54 @@ export default function Navbar() {
                         <div className="hidden sm:block sm:ml-6">
                             <div className="flex space-x-4">
                                 {navigation.map((item) => (
-                                    <NavLink exact
+                                    <NavLink
+                                        exact
                                         to={item.href}
-                                        className='text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium'
-                                        activeClassName="bg-gray-900 text-white"
+                                        key={item.name}
+                                        className='text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium duration-100'
+                                        activeClassName="bg-gray-900 hover:text-gray-300 hover:bg-gray-900"
                                         aria-current={item.current
                                         ? 'page'
                                         : undefined}>
                                         {item.name}
                                     </NavLink>
                                 ))}
+                                <NavLink
+                                    to='/login'
+                                    key='login'
+                                    className='text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium duration-100'
+                                    activeClassName="bg-gray-900 hover:text-gray-300 hover:bg-gray-900">
+                                    Login
+                                </NavLink>
+                                {localStorage.getItem('user-info') && JSON.parse(localStorage.getItem('user-info')).name != null
+                                    ? 
+                                    <> 
+                                        <button className={
+                                            "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium duration-100"
+                                        }
+                                        type="button"
+                                        ref={btnDropdownRef}
+                                        onClick={() => {
+                                            dropdownPopoverShow
+                                            ? closeDropdownPopover()
+                                            : openDropdownPopover();
+                                        }}
+                                        >
+                                        {firstName}
+                                        </button>
+                                        <div ref={popoverDropdownRef} className={ 
+                                            (dropdownPopoverShow ? "block " : "hidden ") +
+                                            "text-base z-50 p-2 float-left list-none text-left rounded shadow-md bg-white overflow-hidden"}
+                                            style={{ minWidth: "12rem" }}>
+                                            <Link to="/" 
+                                                className="text-sm font-normal block w-full whitespace-nowrap bg-transparent hover:text-gray-500" 
+                                                onClick={logout}>
+                                                Logout
+                                            </Link>
+                                        </div>
+                                    </>
+                                    : null
+                                }
                             </div>
                         </div>
                     </div>
@@ -89,11 +157,11 @@ export default function Navbar() {
                         {item.name}
                     </a>
                 ))}
-                {
-                    <a href="">Login</a>
-                }
+                {< a href = "" > Login </a>}
             </div> </Disclosure.Panel>
-        </ >)}
+        </>)}
         </Disclosure>
     )
 }
+
+export default Navbar;
