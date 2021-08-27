@@ -8,6 +8,7 @@ import AddProject from './components/AddProject'
 import Resume from './components/Resume'
 import Work from './components/Work'
 import Contact from './components/Contact'
+import PageNotFound from './components/PageNotFound'
 import {BrowserRouter, Route, Switch} from 'react-router-dom'
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
                 <Route path="/resume" component={Resume}/>
                 <Route path="/work" component={Work}/>
                 <Route path="/contact" component={Contact}/>
+                <Route path='*' exact={true} component={PageNotFound} />
             </Switch>
         </BrowserRouter>
 

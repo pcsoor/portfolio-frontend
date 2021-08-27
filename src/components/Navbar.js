@@ -56,7 +56,8 @@ function Navbar() {
 
     function logout() {
         localStorage.clear();
-        history.go("/login");
+        history.push("/login")
+        history.go();
     }
 
     return (
