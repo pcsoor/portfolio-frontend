@@ -89,6 +89,9 @@ export default function Navbar() {
                         {item.name}
                     </a>
                 ))}
+                {
+                    <a href="">Login</a>
+                }
             </div> </Disclosure.Panel>
         </ >)}
         </Disclosure>
